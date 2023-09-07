@@ -1,0 +1,38 @@
+## 没有写入配置文件的都采用了默认值
+path: "/home/wangshirui/recommend/KGLRR"
+tensorboard: 1
+board_path: "/home/wangshirui/recommend/KGLRR/result"
+seed: 2023
+prefix: '0429'
+device: '1'
+
+# dataset setting
+dataset: amazon-electronics
+maxhis : 10
+topks  : [1, 10, 20]
+
+# model setting
+kgcn: "RGAT"
+latent_dim_rec: 64
+lightGCN_n_layers: 3
+train_trans: True
+entity_num_per_item: 6
+
+kgc_joint : True
+kgc_temp : 0.2
+use_kgc_pretrain : False
+pretrain_kgc : False
+ssl_reg : 0.6
+dropout : 1
+
+r_logic: 1.0e-3
+r_length: 1.0e-3
+l2_loss: 1.0e-3
+
+epoch : 1000
+batch_size : 1024
+test_u_batch_size: 2048
+lr : 5.0e-4
+test_verbose : 1    ##
+test_start_epoch : 15 ##
+early_stop_cnt : 10

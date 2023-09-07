@@ -1,0 +1,44 @@
+## 没有写入配置文件的都采用了默认值
+path: "/home/wangshirui/recommend/KGLRR"
+prefix: "0520"
+device: '0'
+
+tensorboard: 1
+board_path: "/home/wangshirui/recommend/KGLRR/result"
+
+pretrain: False
+multiscore: 0
+seed: 2023
+
+# dataset setting
+dataset: amazon-book
+maxhis : 10
+topks  : [20]
+
+# model setting
+kgcn: "RGAT"
+latent_dim_rec: 64
+lightGCN_n_layers: 3
+train_trans: True
+entity_num_per_item: 10 
+
+kgc_joint : True
+kgc_temp : 0.2
+use_kgc_pretrain : False
+pretrain_kgc : False
+ssl_reg : 0.1
+dropout : 1
+
+r_logic: 1.0e-4
+r_length: 1.0e-4
+l2_loss: 1.0e-3
+loss_sum: True
+
+epoch : 1000
+batch_size : 1024
+test_u_batch_size: 2048
+lr : 5.0e-4
+test_verbose : 1    ##
+test_start_epoch : 15 ##
+early_stop_cnt : 10  ##
+
