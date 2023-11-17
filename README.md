@@ -3,11 +3,17 @@ This is the Pytorch implementation for our paper: Reinforced logical reasoning o
 
 ## Enviroment Requirement
 numpy==1.21.0
+
 pandas==1.3.0
+
 scikit_learn==1.1.1
+
 scipy==1.6.0
+
 torch==1.8.1
+
 torch_geometric==1.7.2
+
 tqdm==4.61.2
 
 ## Dataset
