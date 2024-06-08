@@ -6,7 +6,6 @@ import logging
 from sklearn.metrics import *
 import numpy as np
 import torch.nn as nn
-from model import KGCL
 from GAT import GAT
 import os
 
@@ -272,7 +271,7 @@ class KGLRR(nn.Module):
             return new_v1, new_v2
         return vector1, vector2
 
-    def just_predict(self, users, history):
+    def just_predict(self, users, history, explain=True):
         bs = users.size(0)
         users_embed, item_embed = self.encoder.computer()   # user_num/item_num * V
         
@@ -299,9 +298,30 @@ class KGLRR(nn.Module):
                             + (-left_valid[i] + 1) * item_embed  # item_size * V
             ithpred = self.similarity(sent_vector, self.true, sigmoid=True)  # item_size
             prediction.append(ithpred)
+
+        prediction = torch.stack(prediction).cuda()
+
+        if explain:
+            explaination = self.explain(users, history, prediction)
+            return prediction, explaination
+        return prediction
+
+    def explain(self, users, history, items):
+        bs = users.size(0)
+        users_embed, item_embed = self.encoder.computer()   # user_num/item_num * V
         
-        return torch.stack(prediction).cuda()
+        his_valid = history.ge(0).float()  # B * H
+        maxlen = int(his_valid.sum(dim=1).max().item())
+        elements = item_embed[history.abs()] * his_valid.unsqueeze(-1)  # B * H * V
+
+        similarity_rlt = []
+        for i in range(bs):
+            tmp_a_valid = his_valid[i, :].unsqueeze(-1)  # H
+            tmp_a = self.logic_and(items[i], elements[i]) * tmp_a_valid  # H * V
+            similarity_rlt.append(self.similarity(tmp_a, self.true))
         
+        return torch.stack(similarity_rlt).cuda()
+
     def predict_or_and(self, users, pos, neg, history):
         # 存储用于检查的内容：逻辑正则化 
         # 对嵌入计算L2正则化
@@ -405,5 +425,4 @@ class KGLRR(nn.Module):
         if return_pred:
             return prediction1, rloss+tloss+l2loss
         return rloss, tloss, l2loss
-
 

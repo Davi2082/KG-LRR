@@ -80,6 +80,8 @@ def get_args():
                         help='Expand the raw similarity *sim_scale before sigmoid.')
     parser.add_argument('--layers', type=int, default=1,
                         help='Number of or/and/not hidden layers.')
+    parser.add_argument('--explain', type=bool, default=True,
+                        help='Whether output the explaination or not.')
                         
     parser.add_argument('--train_trans', type=bool, default=False,
                         help='Whether to train transe epoch')
