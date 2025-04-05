@@ -93,6 +93,7 @@ class HisLoader(Dataset):
         self.n_user = 0
         self.m_item = 0
         self.path = f'{config["path"]}/data/{config["dataset"]}'
+        self.trainSize = 0.6
         logging.info(f'loading [{self.path}]')
 
         self.read_file('train')
@@ -114,8 +115,10 @@ class HisLoader(Dataset):
         logging.info(f"{config['dataset']} is ready to go")
 
     def read_file(self, filetype):
-        filepath = self.path+f'/{filetype}.txt'
+        #filepath = self.path+f'/{filetype}.txt'
+        filepath = os.path.abspath(os.path.join(self.path, f'{filetype}.txt'))  #SALE UNA CARTELLA DI TROPPO NONOSTANTE self.path SIA GIUSTO
         if not os.path.exists(filepath):
+            print(f"\033[91mfile {self.path} not exist\033[0m")
             return
 
         UniqueUsers, Item, User = [], [], []

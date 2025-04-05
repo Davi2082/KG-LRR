@@ -19,10 +19,10 @@ topks  : [10, 20]
 kgcn: "RGAT"
 latent_dim_rec: 64
 lightGCN_n_layers: 3
-train_trans: True
+train_trans: False
 entity_num_per_item: 10
 
-kgc_joint : True
+kgc_joint : False
 kgc_temp : 0.2
 use_kgc_pretrain : False
 pretrain_kgc : False
