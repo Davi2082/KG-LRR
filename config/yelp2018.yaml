@@ -1,9 +1,9 @@
 ## 没有写入配置文件的都采用了默认值
-path: "/home/wangshirui/recommend/KGLRR"
+path: ".."
 device: '0'
 prefix: '0520'
 tensorboard: 1
-board_path: "/home/wangshirui/recommend/KGLRR/result"
+board_path: "../result"
 
 pretrain: False
 comment: 'lgn'
