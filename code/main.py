@@ -145,12 +145,15 @@ def main():
     from KGLRR import KGLRR
 
     # save setting
+    base_dir = os.path.dirname(__file__)
+    path_tmp = os.path.abspath(os.path.join(base_dir, config['path']))
+
     file_name = [config['uicontrast'], config['dataset'], str(config['lightGCN_n_layers']), str(config['latent_dim_rec']), config['prefix']]
     file_name = '_'.join(file_name)
-    config['log_file'] = f'{config["path"]}/log/{file_name}.log'
-    config['result_file'] = f'{config["path"]}/result/{file_name}.npy'
+    config['log_file'] = f'{path_tmp}/log/{file_name}.log'
+    config['result_file'] = f'{path_tmp}/result/{file_name}.npy'
     if config['model_save_path'] == '':
-        config['model_save_path'] = f'{config["path"]}/result/{file_name}.pt'
+        config['model_save_path'] = f'{path_tmp}/result/{file_name}.pt'
     logging_init(config)
     logging.info(f"# used cuda device: {config['device']}")
 
@@ -171,7 +174,7 @@ def main():
     # data & model
     if config['dataset'] in ['movielens', 'last-fm', 'MIND', 'yelp2018', 'amazon-book']:
         dataset = dataloader.HisLoader(config)
-        kg_dataset = dataloader.KGDataset(f'{config["path"]}/data/{config["dataset"]}/kg.txt', \
+        kg_dataset = dataloader.KGDataset(f'{path_tmp}/data/{config["dataset"]}/kg.txt', \
                                             config["entity_num_per_item"])
         # 还需要改成不同的设置对应不同模型名称
     Recmodel = KGLRR(config, dataset, kg_dataset).cuda()
