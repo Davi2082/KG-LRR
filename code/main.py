@@ -12,11 +12,14 @@ def get_args():
     parser = argparse.ArgumentParser(description='Model', add_help=False)
 
     # ------ Path setting (relative path to be a universal linux version) ------
-    parser.add_argument('--config', type=lambda x: os.path.expanduser(x),
-                        default="~/KG-LRR/config/yelp2018.yaml",
-                        help='Path to the config file')
-    parser.add_argument('--path', type=lambda x: os.path.expanduser(x),
-                        default="~/KG-LRR",
+    base_dir = os.path.dirname(__file__)
+    default_config = os.path.abspath(os.path.join(base_dir, "../config/yelp2018.yaml"))
+    default_path = os.path.abspath(os.path.join(base_dir, ".."))
+
+    parser.add_argument('--config', type=str, default=default_config,
+                    help='Path to the config file')
+    # ------ Runner setting ------
+    parser.add_argument('--path', type=str, default=default_path,
                     help='Path to the root')
     
     parser.add_argument('--epoch', type=int, default=1000, help='Number of epochs.')
