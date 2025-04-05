@@ -10,11 +10,15 @@ from tensorboardX import SummaryWriter
 
 def get_args():
     parser = argparse.ArgumentParser(description='Model', add_help=False)
-    parser.add_argument('--config', type=str, default="/home/wangshirui/recommend/KGLRR/config/yelp2018.yaml",
-                             help='Path to the config file')
-    # ------ Runner setting ------
-    parser.add_argument('--path', type=str, default="/home/wangshirui/recommend/KGLRR",
-                             help='Path to the root')
+
+    # ------ Path setting (relative path to be a universal linux version) ------
+    parser.add_argument('--config', type=lambda x: os.path.expanduser(x),
+                        default="~/KG-LRR/config/yelp2018.yaml",
+                        help='Path to the config file')
+    parser.add_argument('--path', type=lambda x: os.path.expanduser(x),
+                        default="~/KG-LRR",
+                    help='Path to the root')
+    
     parser.add_argument('--epoch', type=int, default=1000, help='Number of epochs.')
     parser.add_argument('--check_epoch', type=int, default=1, help='Check every epochs.')
     parser.add_argument('--early_stop_cnt', type=int, default=10,
