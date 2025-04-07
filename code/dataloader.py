@@ -84,16 +84,55 @@ class KGDataset(Dataset):
         return head, relation, pos_tail, neg_tail
 
 class HisLoader(Dataset):
+    @staticmethod
+    def get_train_stats(train_file):
+        """
+        Calcola trainSize, n_users e m_items da un file .txt in cui ogni riga
+        è: userID itemID1 itemID2 ... itemIDn
+        
+        Calculates trainSize, n_users, and m_items from a .txt file where each line
+        is: userID itemID1 itemID2 ... itemIDn
+        """
+        train_size = 0
+        n_users = 0
+        max_item_id = -1
+
+        with open(train_file, "r") as f:
+            for line in f:
+                parts = line.strip().split()
+                if not parts:
+                    continue  # salta righe vuote
+                user_id = int(parts[0])
+                item_ids = list(map(int, parts[1:]))
+
+                train_size += len(item_ids)
+                n_users += 1
+                if item_ids:
+                    max_item_id = max(max_item_id, max(item_ids))
+
+        m_items = max_item_id + 1 if max_item_id >= 0 else 0
+
+        return train_size, n_users, m_items
+
     def __init__(self, config:dict):
         # train or test
         self.split = config['A_split']
         self.folds = config['A_n_fold']
-        self.maxhis = config['maxhis']  # 控制取最长历史
-        self.mode = 'train' # 控制获取数据的种类
-        self.n_user = 0
-        self.m_item = 0
+        self.maxhis = config['maxhis']  # 控制取最长历史 - Controls the maximum length of history
+        self.mode = 'train' # 控制获取数据的种类 - Controls the type of data retrieval
         self.path = f'{config["path"]}/{config["dataset"]}'
-        self.trainSize = 0.6
+
+        # Missing attributes
+        tmp_path = os.path.abspath(os.path.join(os.path.dirname(__file__), self.path, 'train.txt'))
+        self.trainSize, self.n_user, self.m_item = self.get_train_stats(tmp_path)
+
+        # Print with colors the stats
+        logging.info(f'\033[36mtrainSize\033[0m: \033[35m{self.trainSize}\033[0m')
+        logging.info(f'\033[36mn_user\033[0m: \033[35m{self.n_user}\033[0m')
+        logging.info(f'\033[36mm_item\033[0m: \033[35m{self.m_item}\033[0m')
+
+        self.testSize = 0
+
         logging.info(f'\033[36mloading [\033[35m' 
                      + os.path.abspath(os.path.join(os.path.dirname(__file__), self.path)) 
                      + '\033[36m]\033[0m')
