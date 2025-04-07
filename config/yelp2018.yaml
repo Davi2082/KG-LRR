@@ -1,5 +1,5 @@
 ## 没有写入配置文件的都采用了默认值
-path: ".."
+path: "../data"
 device: '0'
 prefix: '0520'
 tensorboard: 1
