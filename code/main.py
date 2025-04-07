@@ -118,21 +118,49 @@ def load_config(args):
     ori_opt.update(opt) # 以config文件中的内容为准
     return ori_opt
 
-def logging_init(config):   
+import logging
+import sys
+
+def logging_init(config):    
     for handler in logging.root.handlers[:]:
         logging.root.removeHandler(handler)
     logging.basicConfig(filename=config['log_file'], level=config['verbose'], filemode='a')
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
-    logging.info('===========config================')
-    logging.info("KGCN:{}, TransR:{}, N:{}".format(config['kgcn'], config['train_trans'], config['entity_num_per_item']))
-    logging.info("KGC: {} @ d_prob:{} @ joint:{} @ from_pretrain:{}".format(config['kgc_enable'], config['kg_p_drop'],\
-                                                                     config['kgc_joint'], config['use_kgc_pretrain']))
-    logging.info("UIC: {} @ d_prob:{} @ temp:{} @ reg:{}".format(config['uicontrast'], config['ui_p_drop'],\
-                                                                 config['kgc_temp'], config['ssl_reg']))
-    message = '\n'.join([f'{k:<20}: {v}' for k, v in config.items()])
-    logging.info(message)
-    logging.info('\n=================== End ===================\n')
+    logging.info('\n==================== Configuration ====================\n')
+
+    # Titoli personalizzati
+    logging.info(f"{'Section':<15} | {'Key':<25} | {'Value'}")
+    logging.info("-" * 60)
+
+    # Righe principali raggruppate per sezione
+    logging.info(f"{'Model':<15} | {'kgcn':<25} | {config['kgcn']}")
+    logging.info(f"{'Model':<15} | {'train_trans':<25} | {config['train_trans']}")
+    logging.info(f"{'Model':<15} | {'entity_num_per_item':<25} | {config['entity_num_per_item']}")
+
+    logging.info(f"{'KGC':<15} | {'kgc_enable':<25} | {config['kgc_enable']}")
+    logging.info(f"{'KGC':<15} | {'kg_p_drop':<25} | {config['kg_p_drop']}")
+    logging.info(f"{'KGC':<15} | {'kgc_joint':<25} | {config['kgc_joint']}")
+    logging.info(f"{'KGC':<15} | {'use_kgc_pretrain':<25} | {config['use_kgc_pretrain']}")
+
+    logging.info(f"{'UIC':<15} | {'uicontrast':<25} | {config['uicontrast']}")
+    logging.info(f"{'UIC':<15} | {'ui_p_drop':<25} | {config['ui_p_drop']}")
+    logging.info(f"{'UIC':<15} | {'kgc_temp':<25} | {config['kgc_temp']}")
+    logging.info(f"{'UIC':<15} | {'ssl_reg':<25} | {config['ssl_reg']}")
+
+    logging.info("-" * 60)
+
+    # Tutti gli altri parametri generici
+    for k, v in config.items():
+        if k not in [
+            'kgcn', 'train_trans', 'entity_num_per_item',
+            'kgc_enable', 'kg_p_drop', 'kgc_joint', 'use_kgc_pretrain',
+            'uicontrast', 'ui_p_drop', 'kgc_temp', 'ssl_reg'
+        ]:
+            logging.info(f"{'General':<15} | {k:<25} | {v}")
+
+    logging.info('\n====================== End ==========================\n')
+
 
 def main():
     warnings.filterwarnings("ignore", category=UserWarning, module="torch\\.cuda")
@@ -158,7 +186,7 @@ def main():
     if config['model_save_path'] == '':
         config['model_save_path'] = f'{path_tmp}/result/{file_name}.pt'
     logging_init(config)
-    logging.info(f"# Used cuda device: <{config['device']}> \033[92m{torch.cuda.get_device_name(int(config['device']))}\033[0m. Count of devices: {torch.cuda.device_count()}\n")
+    logging.info(f"# Used cuda device: <\033[92m{config['device']}\033[0m> \033[92m{torch.cuda.get_device_name(int(config['device']))}\033[0m. Count of devices: \033[92m{torch.cuda.device_count()}\033[0m\n")
 
     # random seed
     torch.manual_seed(config['seed'])
