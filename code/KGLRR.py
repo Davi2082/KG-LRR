@@ -27,8 +27,11 @@ class KGEncoder(nn.Module):
         self.num_items = self.dataset.m_items
         self.num_entities = self.kg_dataset.entity_count
         self.num_relations = self.kg_dataset.relation_count
-        logging.info("user:{}, item:{}, entity:{}".format(
-            self.num_users, self.num_items, self.num_entities))
+       
+        # Print with colors the stats
+        logging.info(f'\033[36mtrainSize\033[0m: \033[35m{self.dataset.trainSize}\033[0m')
+        logging.info(f'\033[36mn_user\033[0m: \033[35m{self.dataset.n_user}\033[0m')
+        logging.info(f'\033[36mm_item\033[0m: \033[35m{self.dataset.m_item}\033[0m')
 
         self.embedding_user = torch.nn.Embedding(
             num_embeddings=self.num_users, embedding_dim=self.latent_dim)

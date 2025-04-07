@@ -84,36 +84,7 @@ class KGDataset(Dataset):
         return head, relation, pos_tail, neg_tail
 
 class HisLoader(Dataset):
-    @staticmethod
-    def get_train_stats(train_file):
-        """
-        Calcola trainSize, n_users e m_items da un file .txt in cui ogni riga
-        è: userID itemID1 itemID2 ... itemIDn
-        
-        Calculates trainSize, n_users, and m_items from a .txt file where each line
-        is: userID itemID1 itemID2 ... itemIDn
-        """
-        train_size = 0
-        n_users = 0
-        max_item_id = -1
-
-        with open(train_file, "r") as f:
-            for line in f:
-                parts = line.strip().split()
-                if not parts:
-                    continue  # salta righe vuote
-                user_id = int(parts[0])
-                item_ids = list(map(int, parts[1:]))
-
-                train_size += len(item_ids)
-                n_users += 1
-                if item_ids:
-                    max_item_id = max(max_item_id, max(item_ids))
-
-        m_items = max_item_id + 1 if max_item_id >= 0 else 0
-
-        return train_size, n_users, m_items
-
+    
     def __init__(self, config:dict):
         # train or test
         self.split = config['A_split']
@@ -123,13 +94,9 @@ class HisLoader(Dataset):
         self.path = f'{config["path"]}/{config["dataset"]}'
 
         # Missing attributes
-        tmp_path = os.path.abspath(os.path.join(os.path.dirname(__file__), self.path, 'train.txt'))
-        self.trainSize, self.n_user, self.m_item = self.get_train_stats(tmp_path)
-
-        # Print with colors the stats
-        logging.info(f'\033[36mtrainSize\033[0m: \033[35m{self.trainSize}\033[0m')
-        logging.info(f'\033[36mn_user\033[0m: \033[35m{self.n_user}\033[0m')
-        logging.info(f'\033[36mm_item\033[0m: \033[35m{self.m_item}\033[0m')
+        self.trainSize = 0
+        self.n_user = 0
+        self.m_item = 0
 
         self.testSize = 0
 
@@ -157,7 +124,7 @@ class HisLoader(Dataset):
 
     def read_file(self, filetype):
         #filepath = self.path+f'/{filetype}.txt' old version
-        filepath = os.path.abspath(os.path.join(os.path.dirname(__file__), self.path, f'{filetype}.txt'))  #SALE UNA CARTELLA DI TROPPO NONOSTANTE self.path SIA GIUSTO
+        filepath = os.path.abspath(os.path.join(os.path.dirname(__file__), self.path, f'{filetype}.txt'))
         if not os.path.exists(filepath): #TODO convert the if in a try catch
             logging.info(f"\033[91mfile {filepath} doesn't exist\033[0m")
             return
@@ -261,11 +228,17 @@ class HisLoader(Dataset):
     def getSparseGraph(self):
         '''计算图卷积中的连接图，包括A~等
         返回的数据是经过处理的列表，列表长度由self.fold决定，其中每一项都是一个稀疏矩阵，表示对应长度下该序号entity的连接矩阵
+
+        Calculate the connection graph in graph convolution, including A~, etc.
+        The returned data is a processed list, the length of the list is determined by self.fold, 
+        and each item in the list is a sparse matrix representing the connection matrix of the entity 
+        at the corresponding index for that length
         '''
         logging.info("loading adjacency matrix")
         if self.Graph is None:
+            A_path = os.path.abspath(os.path.join(os.path.dirname(__file__), self.path, 's_pre_adj_mat.npz'))
             try:
-                pre_adj_mat = sp.load_npz(self.path + '/s_pre_adj_mat.npz')
+                pre_adj_mat = sp.load_npz(A_path)
                 logging.info("successfully loaded...")
                 norm_adj = pre_adj_mat
             except :
@@ -290,15 +263,15 @@ class HisLoader(Dataset):
                 norm_adj = norm_adj.tocsr()
                 end = time()
                 logging.info(f"costing {end-s}s, saved norm_mat...")
-                sp.save_npz(self.path + '/s_pre_adj_mat.npz', norm_adj)
+                sp.save_npz(A_path, norm_adj)
 
             if self.split == True:
                 self.Graph = self._split_A_hat(norm_adj)
-                logging.info("done split matrix")
+                logging.info("matrix splitted")
             else:
                 self.Graph = self._convert_sp_mat_to_sp_tensor(norm_adj)
                 self.Graph = self.Graph.coalesce().cuda()
-                logging.info("don't split the matrix")
+                logging.info("didn't split the matrix")
         return self.Graph
 
     def getUserPosItems(self, users):

@@ -186,8 +186,18 @@ def main():
     if config['model_save_path'] == '':
         config['model_save_path'] = f'{path_tmp}/result/{file_name}.pt'
     logging_init(config)
-    logging.info(f"# Used cuda device: <\033[92m{config['device']}\033[0m> \033[92m{torch.cuda.get_device_name(int(config['device']))}\033[0m. Count of devices: \033[92m{torch.cuda.device_count()}\033[0m\n")
+    if config['device'] == 'cpu':
+        logging.info("# Using \33[36mCPU\33[0m")
+    else:
+        logging.info("# Using \33[92mGPU\33[0m")
+        if torch.cuda.is_available():
+            logging.info(f"# CUDA version: {torch.version.cuda}")
+            logging.info(f"# PyTorch version: {torch.__version__}")
+            logging.info(f"# CUDNN version: {torch.backends.cudnn.version()}")
+        else:
+            logging.info("# CUDA not available")
 
+    
     # random seed
     torch.manual_seed(config['seed'])
     torch.cuda.manual_seed(config['seed'])
@@ -205,8 +215,7 @@ def main():
     # data & model
     if config['dataset'] in ['movielens', 'last-fm', 'MIND', 'yelp2018', 'amazon-book']:
         dataset = dataloader.HisLoader(config)
-        kg_dataset = dataloader.KGDataset(f'{path_tmp}/data/{config["dataset"]}/kg.txt', \
-                                            config["entity_num_per_item"])
+        kg_dataset = dataloader.KGDataset(os.path.abspath(os.path.join(os.path.dirname(__file__), config['path'], config['dataset'], 'kg.txt')), config["entity_num_per_item"])
         # 还需要改成不同的设置对应不同模型名称
     Recmodel = KGLRR(config, dataset, kg_dataset).cuda()
     if config['pretrain']:
@@ -254,7 +263,7 @@ def main():
             
             # joint learning part
             if not config['pretrain_kgc']:
-                Procedure.BPR_train_original(dataset, Recmodel, optimizer, epoch, w=w)
+                Procedure.BPR_train_original(dataset, Recmodel, optimizer, epoch=epoch, batch_size=config['batch_size'], w=w)
                 
                 if epoch<config['test_start_epoch']:
                     if epoch %5 == 0:
