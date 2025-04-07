@@ -7,6 +7,8 @@ import numpy as np
 import yaml
 from tqdm import tqdm
 from tensorboardX import SummaryWriter
+import warnings
+
 
 def get_args():
     parser = argparse.ArgumentParser(description='Model', add_help=False)
@@ -130,9 +132,10 @@ def logging_init(config):
                                                                  config['kgc_temp'], config['ssl_reg']))
     message = '\n'.join([f'{k:<20}: {v}' for k, v in config.items()])
     logging.info(message)
-    logging.info('===========end===================')
+    logging.info('\n=================== End ===================\n')
 
 def main():
+    warnings.filterwarnings("ignore", category=UserWarning, module="torch\\.cuda")
     args = get_args()
     config = load_config(args)
 
@@ -155,7 +158,7 @@ def main():
     if config['model_save_path'] == '':
         config['model_save_path'] = f'{path_tmp}/result/{file_name}.pt'
     logging_init(config)
-    logging.info(f"# used cuda device: {config['device']}")
+    logging.info(f"# Used cuda device: <{config['device']}> \033[92m{torch.cuda.get_device_name(int(config['device']))}\033[0m. Count of devices: {torch.cuda.device_count()}\n")
 
     # random seed
     torch.manual_seed(config['seed'])
