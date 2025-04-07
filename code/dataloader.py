@@ -92,7 +92,7 @@ class HisLoader(Dataset):
         self.mode = 'train' # 控制获取数据的种类
         self.n_user = 0
         self.m_item = 0
-        self.path = f'{config["path"]}/data/{config["dataset"]}'
+        self.path = f'{config["path"]}/{config["dataset"]}'
         self.trainSize = 0.6
         logging.info(f'loading [{self.path}]')
 
@@ -115,10 +115,11 @@ class HisLoader(Dataset):
         logging.info(f"{config['dataset']} is ready to go")
 
     def read_file(self, filetype):
-        #filepath = self.path+f'/{filetype}.txt'
-        filepath = os.path.abspath(os.path.join(self.path, f'{filetype}.txt'))  #SALE UNA CARTELLA DI TROPPO NONOSTANTE self.path SIA GIUSTO
+        filepath = self.path+f'/{filetype}.txt'
+        #filepath = os.path.abspath(os.path.join(os.path.dirname(__file__), f'../data/{filetype}.txt'))  #SALE UNA CARTELLA DI TROPPO NONOSTANTE self.path SIA GIUSTO
+        filepath = os.path.abspath(os.path.join(os.path.dirname(__file__), self.path, f'{filetype}.txt'))  #SALE UNA CARTELLA DI TROPPO NONOSTANTE self.path SIA GIUSTO
         if not os.path.exists(filepath):
-            print(f"\033[91mfile {self.path} not exist\033[0m")
+            print(f"\033[91mfile {filepath} not exist\033[0m")
             return
 
         UniqueUsers, Item, User = [], [], []
