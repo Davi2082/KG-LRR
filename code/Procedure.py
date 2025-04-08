@@ -75,6 +75,8 @@ def test_one_batch(topks, X):
 
 
 def Test(dataset, Recmodel, u_batch_size, topks, epoch, w=None, multicore=0):
+    print('\33[1;32m' + f'dataset is {type(dataset)}' + '\33[0m')
+    print('\33[1;32m' + f'testSize is {dataset.testSize}' + '\33[0m')
     # eval mode with no dropout
     dataset.mode = 'test'
     dataloader = DataLoader(dataset, batch_size=u_batch_size,

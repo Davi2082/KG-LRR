@@ -131,7 +131,7 @@ class HisLoader(Dataset):
 
         UniqueUsers, Item, User = [], [], []
         UsersHis = []
-        dataSize = 0
+        self.dataSize = 0
 
         with open(filepath) as f:
             for l in f.readlines():

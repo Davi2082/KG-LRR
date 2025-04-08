@@ -36,7 +36,7 @@ loss_sum: True
 
 epoch : 1000
 batch_size : 1024
-test_u_batch_size: 2048
+test_u_batch_size: 512
 lr : 5.0e-4
 test_verbose : 1    ##
 test_start_epoch : 15

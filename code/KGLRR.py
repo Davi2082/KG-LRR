@@ -14,6 +14,9 @@ class KGEncoder(nn.Module):
         super().__init__()
         self.kgcn = config['kgcn']
         self.dropout = config['dropout']
+        self.keep_prob = 1 - self.dropout #Added
+        self.A_split = config['A_split']
+
         self.latent_dim = config['latent_dim_rec']
         self.n_layers = config['lightGCN_n_layers']
         self.dataset = dataset
