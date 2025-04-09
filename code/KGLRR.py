@@ -185,6 +185,7 @@ class KGLRR(nn.Module):
         self.l2s_weight = config['l2_loss']
         
         self.dataset = dataset
+        self.num_items = dataset.m_items
         self.kg_dataset = kg_dataset
 
         self._init_weights()
@@ -209,7 +210,7 @@ class KGLRR(nn.Module):
             vector = F.relu(getattr(self, 'or_layer_%d' % i)(vector))
         vector = self.or_layer(vector)
         return vector
-        
+    
     def logic_and(self, vector1, vector2, train=False):
         vector1, vector2 = self.uniform_size(vector1, vector2, train)
         vector = torch.cat((vector1, vector2), dim=-1)
@@ -263,7 +264,7 @@ class KGLRR(nn.Module):
             return result.sigmoid()
         return result
 
-    # 删除掉了向量大小的归一化
+    # 删除掉了向量大小的归一化 - Removed vector size normalization
     def uniform_size(self, vector1, vector2, train=False):
         if len(vector1.size()) < len(vector2.size()):
             vector1 = vector1.expand_as(vector2)
@@ -279,10 +280,12 @@ class KGLRR(nn.Module):
 
     def just_predict(self, users, history, explain=True):
         bs = users.size(0)
-        users_embed, item_embed = self.encoder.computer()   # user_num/item_num * V
+        item_embed = self.encoder.computer()[1]   # item_num * V
         
         his_valid = history.ge(0).float()  # B * H
+
         maxlen = int(his_valid.sum(dim=1).max().item())
+        
         elements = item_embed[history.abs()] * his_valid.unsqueeze(-1)  # B * H * V
 
         tmp_o = None
@@ -323,7 +326,7 @@ class KGLRR(nn.Module):
         similarity_rlt = []
         for i in range(bs):
             tmp_a_valid = his_valid[i, :].unsqueeze(-1)  # H
-            tmp_a = self.logic_and(items[i], elements[i]) * tmp_a_valid  # H * V
+            tmp_a = self.logic_and(items[i].unsqueeze(0).expand_as(elements[i]), elements[i]) * tmp_a_valid
             similarity_rlt.append(self.similarity(tmp_a, self.true))
         
         return torch.stack(similarity_rlt).cuda()

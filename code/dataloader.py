@@ -94,11 +94,11 @@ class HisLoader(Dataset):
         self.path = f'{config["path"]}/{config["dataset"]}'
 
         # Missing attributes
-        self.trainSize = 0
+        #self.trainSize = 0
         self.n_user = 0
         self.m_item = 0
 
-        self.testSize = 0
+        #self.testSize = 0
 
         logging.info(f'\033[36mloading [\033[35m' 
                      + os.path.abspath(os.path.join(os.path.dirname(__file__), self.path)) 
@@ -131,7 +131,7 @@ class HisLoader(Dataset):
 
         UniqueUsers, Item, User = [], [], []
         UsersHis = []
-        self.dataSize = 0
+        dataSize = 0
 
         with open(filepath) as f:
             for l in f.readlines():
@@ -167,8 +167,10 @@ class HisLoader(Dataset):
         logging.info(f"{dataSize} interactions for {filetype}")
 
     def read_whole_line(self, filetype):
-        filepath = self.path+f'/{filetype}.txt'
-        if not os.path.exists(filepath):
+        #filepath = self.path+f'/{filetype}.txt' old version
+        filepath = os.path.abspath(os.path.join(os.path.dirname(__file__), self.path, f'{filetype}.txt'))
+        if not os.path.exists(filepath): #TODO convert the if in a try catch
+            logging.info(f"\033[91mfile {filepath} doesn't exist\033[0m")
             return
 
         Item, User = [], []
@@ -189,7 +191,7 @@ class HisLoader(Dataset):
                     dataSize += 1
         
         setattr(self, f'{filetype}User', np.array(User))
-        setattr(self, f'{filetype}Item', np.array(Item))
+        setattr(self, f'{filetype}Item', np.array(Item, dtype=object))
         setattr(self, f'{filetype}Size', dataSize)
         logging.info(f"{dataSize} interactions for {filetype}")
 
