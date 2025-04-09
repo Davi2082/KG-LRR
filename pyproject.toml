@@ -3,15 +3,17 @@ name = "kg-lrr"
 version = "0.1.0"
 description = "Knowledge Graph Logic Regularized Recommender"
 authors = [{ name = "Emanuele", email = "you@example.com" }]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 dependencies = [
-    "numpy==1.21.0",
-    "pandas==1.3.0",
-    "scikit-learn==1.1.1",
-    "scipy==1.6.0",
-    "torch==1.8.1",
-    "torch-geometric==1.7.2",
-    "tqdm==4.61.2",
+    "numpy==1.24",
+    "pandas==1.5",
+    "scikit-learn==1.3.1",
+    "scipy==1.10.1",
+    "torch==2.1.0",
+    "torchvision==0.16.0",
+    "torchaudio==2.1.0",
+    "torch-geometric==2.5.0",
+    "tqdm",
     "PyYAML",
     "tensorboardX"
 ]
