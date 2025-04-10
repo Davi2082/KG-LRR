@@ -326,7 +326,7 @@ class KGLRR(nn.Module):
         similarity_rlt = []
         for i in range(bs):
             tmp_a_valid = his_valid[i, :].unsqueeze(-1)  # H
-            tmp_a = self.logic_and(items[i].unsqueeze(0).expand_as(elements[i]), elements[i]) * tmp_a_valid
+            tmp_a = self.logic_and(items[i].unsqueeze(0), elements[i]) * tmp_a_valid  # H * V
             similarity_rlt.append(self.similarity(tmp_a, self.true))
         
         return torch.stack(similarity_rlt).cuda()
