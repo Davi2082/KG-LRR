@@ -74,7 +74,7 @@ def test_one_batch(topks, X):
             'ndcg': np.array(ndcg)}
 
 
-def Test(dataset, Recmodel, u_batch_size, topks, epoch, w=None, multicore=0):
+def Test(dataset, Recmodel, u_batch_size, topks, epoch, w=None, multicore=0, explain=True):
     print('\33[1;32m' + f'dataset is {type(dataset)}' + '\33[0m')
     print('\33[1;32m' + f'testSize is {dataset.testSize}' + '\33[0m')
     # eval mode with no dropout
@@ -118,6 +118,31 @@ def Test(dataset, Recmodel, u_batch_size, topks, epoch, w=None, multicore=0):
             users_list.append(batch_users)
             rating_list.append(rating_K.cpu())
             groundTrue_list.append(batch_items)
+
+            if explain:
+                bs = batch_users.size(0)
+                users_embed, item_embed = Recmodel.encoder.computer()   # user_num/item_num * V
+                
+                his_valid = batch_his.ge(0).float()  # B * H
+                maxlen = int(his_valid.sum(dim=1).max().item())
+                elements = item_embed[batch_his.abs()] * his_valid.unsqueeze(-1)  # B * H * V
+
+                similarity_rlt = []
+                # extract the item embeddings of the top K items
+                rating_K_embed = item_embed[rating_K]  # B * K * V
+                # repeat rating_K_embed and elements such that each top-k item embedding
+                # is compared with all the history items embeddings, as we need to compute
+                # the logic AND operation between each combination of top-k and history items
+                # to find the best explanation
+                rating_K_embed = rating_K_embed.unsqueeze(2).expand(-1, -1, maxlen, -1)  # B * K * H * V
+                for i in range(bs):
+                    tmp_a_valid = his_valid[i, :].unsqueeze(-1)  # H
+                    tmp_a = Recmodel.logic_and(rating_K_embed[i], elements[i]) * tmp_a_valid  # H * V
+                    similarity_rlt.append(Recmodel.similarity(tmp_a, Recmodel.true))
+                
+                # explanations not actually used in the code, but relevant for experiments
+                final_explanations = torch.stack(similarity_rlt).cuda()
+
         X = zip(rating_list, groundTrue_list)
         if multicore == 1:
             pre_results = pool.map(pfunc, X)

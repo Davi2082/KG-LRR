@@ -31,6 +31,7 @@ def RecallPrecision_ATk(ground_true, r, k):
     """
     right_pred = r[:, :k].sum(1)
     precis_n = k
+    ground_true = ground_true.cpu().numpy()
     recall_n = np.array([(ground_true[i]>0).sum() for i in range(len(ground_true))])
     recall = np.sum(right_pred/recall_n)
     precis = np.sum(right_pred)/precis_n

@@ -185,6 +185,9 @@ def main():
     config['result_file'] = f'{path_tmp}/result/{file_name}.npy'
     if config['model_save_path'] == '':
         config['model_save_path'] = f'{path_tmp}/result/{file_name}.pt'
+    os.makedirs(os.path.dirname(config['log_file']), exist_ok=True)
+    os.makedirs(os.path.dirname(config['result_file']), exist_ok=True)
+    os.makedirs(os.path.dirname(config['model_save_path']), exist_ok=True)
     logging_init(config)
     if config['device'] == 'cpu':
         logging.info("# Using \33[36mCPU\33[0m")
