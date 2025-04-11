@@ -17,6 +17,9 @@ topks  : [10, 20]
 
 # model setting
 kgcn: "RGAT"
+
+# Specifica la dimensione del vettore latente utilizzato per la rappresentazione degli utenti e degli elementi nel modello di raccomandazione.
+# Un valore più alto può catturare più caratteristiche, ma aumenta la complessità computazionale.
 latent_dim_rec: 64
 lightGCN_n_layers: 3
 train_trans: False
@@ -36,7 +39,7 @@ loss_sum: True
 
 epoch : 1000
 batch_size : 1024
-test_u_batch_size: 512
+test_u_batch_size: 2048
 lr : 5.0e-4
 test_verbose : 1    ##
 test_start_epoch : 15
