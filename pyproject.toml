@@ -2,7 +2,10 @@
 name = "kg-lrr"
 version = "0.1.0"
 description = "Knowledge Graph Logic Regularized Recommender"
-authors = [{ name = "Emanuele", email = "you@example.com" }]
+authors = [
+    { name = "Emanuele Caddeo", email = "" }
+    { name = "Davide Cocco", email = ""}
+    ]
 requires-python = ">=3.11"
 dependencies = [
     "numpy==1.24",

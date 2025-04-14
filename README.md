@@ -9,19 +9,25 @@ In this paper, we propose an ”encoder-decoder" architecture that uses a better
 ## Main Environment Requirements
 
 ```
-numpy==1.21.0
+numpy==1.24
 
-pandas==1.3.0
+pandas==1.5
+    
+scikit-learn==1.3.1
+    
+scipy==1.10.1
+    
+torch
 
-scikit_learn==1.1.1
+torchvision
 
-scipy==1.6.0
+torchaudio
 
-torch==1.8.1
+tqdm
 
-torch_geometric==1.7.2
+PyYAML
 
-tqdm==4.61.2
+tensorboardX
 ```
 
 ## Dataset
